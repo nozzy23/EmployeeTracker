@@ -12,20 +12,75 @@ const connection=mysql.createConnection({
 
 connection.connect(function(err){
     if (err) throw err;
-    begin();
+    welcome();
 });
 
 console.table([
-    
-])
+    {
+        Employee_id: 0,
+        Name: "Oscar Nunez",
+        Role_ID: 2,
+        Manager_ID:0
+    }
+
+]);
+
+//BEGINNING CHOICES
+function welcome(){
+    inquire.prompt({
+        name: "Welcome",
+        type: "list",
+        message: "Hello Would you like to",
+        choices: ["AddInformation", "ViewInformation", "UpdateRole", "EXIT"]
+        })
+.then(function(answer){
+    if (answer.Welcome === "AddInformation") {
+        start();
+        }
+        else if(answer.Welcome === "ViewInformation") {
+        beginRole();
+        }
+        else if(answer.Welcome === "UpdateRole"){
+            //function
+        } 
+        else{
+        connection.end();
+        }
+});
+}
+
+
+//Start by presenting options
+function start(){
+    inquire.prompt({
+        name: "ADDING",
+        type: "list",
+        message: "Hello Would you like to add a",
+        choices: ["EMPLOYEE", "ROLE", "DEPARTMENT", "EXIT"]
+        })
+.then(function(answer){
+    if (answer.ADDING === "EMPLOYEE") {
+        beginEmployee();
+        }
+        else if(answer.ADDING === "ROLE") {
+        beginRole();
+        }
+        else if(answer.ADDING === "DEPARTMENT"){
+            //function
+        } 
+        else{
+        connection.end();
+        }
+});
+}
 
 //starts asking if you would like to add or remove a employee.
-function begin(){
+function beginEmployee(){
     inquire.prompt({
-        name: "addOrDelete",
-      type: "list",
-      message: "Would you like to add a new Employee or remove one?",
-      choices: ["ADD", "REMOVE", "EXIT"]
+    name: "addOrDelete",
+    type: "list",
+    message: "Would you like to add a new Employee or remove one?",
+    choices: ["ADD", "REMOVE", "EXIT"]
     })
     .then(function(answer){
         if (answer.addOrDelete === "ADD") {
@@ -41,11 +96,6 @@ function begin(){
 
 function Addemployee(){
     inquire.prompt([
-        {
-            name: "employeeID",
-            type: "input",
-            message: "Please provide New employees ID."
-        },
         {
             name: "employeeFirst",
             type: "input",
@@ -75,18 +125,17 @@ function Addemployee(){
     ])
     .then(function(answer){
     connection.query (
-            "INSERT INTO EMPLOYEE (ID,FIRST_NAME,LAST_NAME, ROLE_ID, MANAGER_ID) VALUES (ID,FIRST_NAME,LAST_NAME,ROLE_ID,Manager_ID);",
+            "INSERT INTO EMPLOYEE (FIRST_NAME,LAST_NAME, ROLE_ID, MANAGER_ID) VALUES (?)",
         {
-            employee_ID: answer.employeeID,
-            first_Name: answer.employeeFirst,
-            last_Name: answer.employeeLast,
-            job_Title: answer.employeeTitleID || 0,
-            reporting_manager: answer.ManagerID || 0
+            FIRST_NAME: answer.employeeFirst,
+            LAST_NAME: answer.employeeLast,
+            ROLE_ID: parseInt(answer.employeeTitleID) || 0,
+            MANAGER_ID: parseInt(answer.ManagerID) || 0
         },
         function (err){
             if (err) throw err;
             console.log("You've added a new employee succesfully!");
-            begin();
+            welcome();
         }
     );
     });
@@ -109,8 +158,67 @@ function removeEmployee(){
         {
             if (err) throw err;
             console.log("You have removed a employee succesfully!");
-            begin();
+            welcome();
         }
     )
 })
+};
+
+function beginRole(){
+    inquire.prompt({
+    name: "addOrDelete",
+    type: "list",
+    message: "Would you like to add a new Role or remove one?",
+    choices: ["ADD", "REMOVE", "EXIT"]
+    })
+    .then(function(answer){
+        if (answer.addOrDelete === "ADD") {
+            addRole();
+          }
+          else if(answer.addOrDelete === "REMOVE") {
+            removeEmployee();
+          } else{
+            connection.end();
+          }
+    });
+}
+
+function addRole(){
+    inquire.prompt([
+        {
+            name: "Title",
+            type: "input",
+            message: "Please enter Employees new Job title."
+        },
+        {
+            name: "employeeSalary",
+            type: "input",
+            message: "Employee starting salary."
+        },
+        {
+            name: "employeeDepartmentID",
+            type: "input",
+            message: "Please enter depeartment ID", validate: function(value) {
+                if (isNaN(value) === false) {
+                  return true;
+                }
+                return false;
+              }
+        },
+    ])
+    .then(function(answer){
+    connection.query (
+            "INSERT INTO ROLE (TITLE,SALARY, DEPARTMENT_ID) VALUES (?)",
+        {
+            TITLE: answer.Title,
+            SALARY: answer.employeeSalary,
+            DEPARTMENT_ID: parseInt(answer.employeeDepartmentID) || 0
+        },
+        function (err){
+            if (err) throw err;
+            console.log("You've added a new role");
+            start();
+        }
+    );
+    });
 }
