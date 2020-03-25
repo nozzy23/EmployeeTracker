@@ -38,7 +38,7 @@ function welcome(){
         start();
         }
         else if(answer.Welcome === "ViewInformation") {
-        beginRole();
+        viewInfo()
         }
         else if(answer.Welcome === "UpdateRole"){
             //function
@@ -260,6 +260,55 @@ function addDepartment(){
             console.log("You've added a new Department");
             welcome();
         }
-    );
-    });
+    )
+    })
+};
+
+function viewInfo(){
+    inquire.prompt({
+        name: "viewList",
+        type: "list",
+        message: "What would you like to view?",
+        choices: ["ROLES", "EMPLOYEE", "DEPARTMENT","BACK"]
+}).then(function(answer){
+    if (answer.viewList === "ROLES") {
+        roleInformation();
+        }
+        else if(answer.viewList === "EMPLOYEE") {
+        employeeInformation();
+        }
+        else if(answer.viewList === "DEPARTMENT"){
+        Departmentinformation()
+        } 
+        else {
+        welcome();
+        }
+ })
+};
+
+function roleInformation(){
+    connection.query (
+        "SELECT TITLE FROM EMPLOYEE_TRACK.ROLE;",
+    function (err){
+        if (err) throw err;
+    }
+);
+}
+
+function employeeInformation(){
+    connection.query (
+        "SELECT * FROM EMPLOYEE_TRACK.EMPLOYEE;",
+    function (err){
+        if (err) throw err;
+    }
+);
+}
+
+function Departmentinformation(){
+    connection.query (
+    "SELECT * FROM EMPLOYEE_TRACK.DEPARTMENT;",
+    function (err){
+        if (err) throw err;
+    }
+);
 }
