@@ -66,7 +66,7 @@ function start(){
         beginRole();
         }
         else if(answer.ADDING === "DEPARTMENT"){
-            //function
+            addDepartment()
         } 
         else{
         connection.end();
@@ -163,20 +163,17 @@ function removeEmployee(){
     )
 })
 };
-
+// Adding role
 function beginRole(){
     inquire.prompt({
-    name: "addOrDelete",
+    name: "addRole",
     type: "list",
     message: "Would you like to add a new Role or remove one?",
-    choices: ["ADD", "REMOVE", "EXIT"]
+    choices: ["ADD", "EXIT"]
     })
     .then(function(answer){
-        if (answer.addOrDelete === "ADD") {
+        if (answer.addRole === "ADD") {
             addRole();
-          }
-          else if(answer.addOrDelete === "REMOVE") {
-            removeEmployee();
           } else{
             connection.end();
           }
@@ -217,7 +214,51 @@ function addRole(){
         function (err){
             if (err) throw err;
             console.log("You've added a new role");
-            start();
+            welcome();
+        }
+    );
+    });
+}
+
+function beginRole(){
+    inquire.prompt({
+    name: "addRole",
+    type: "list",
+    message: "Would you like to add a new Role or remove one?",
+    choices: ["ADD", "EXIT"]
+    })
+    .then(function(answer){
+        if (answer.addRole === "ADD") {
+            addRole();
+          } else{
+            connection.end();
+          }
+    });
+}
+// Add Departments
+function addDepartment(){
+    inquire.prompt([
+        {
+            name: "employeeDepartment",
+            type: "input",
+            message: "Add a New Department", validate: function(value) {
+                if (isNaN(value) === false) {
+                  return true;
+                }
+                return false;
+              }
+        },
+    ])
+    .then(function(answer){
+    connection.query (
+            "INSERT INTO DEPARTMENT (NAME) VALUES (?)",
+        {
+            NAME: answer.employeeDepartment
+        },
+        function (err){
+            if (err) throw err;
+            console.log("You've added a new Department");
+            welcome();
         }
     );
     });
